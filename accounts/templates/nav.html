@@ -1,0 +1,37 @@
+{% load static %}
+<style>
+  .hello-user{
+    font-size: 18px;
+    color: #fff;
+    margin-right: 20px;
+  }
+</style>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <img class="saswat-logo6" src="{% static 'images/saswat-logo6.png'%}" alt="logo6" height="60" width="100">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+          <div class="navbar-nav">
+            <a class="nav-item nav-link active" href="/"> Dashboard </a>
+            <a class="nav-item nav-link" href="{% url 'products' %}">Products</a>
+          
+          </div>
+        </div>
+        
+        
+       
+          
+          {% if user.is_authenticated %}
+          <span class="hello-user">Hello, {{request.user}}</span>
+        <span class="hello-user"><a href="{% url 'logout' %}">Logout</a></span>
+        <span class="settings"><a href="{% url 'settings' %}">Account Setting</a></span>
+        
+        {% else %}
+        <span class="hello-user"><a href="{% url 'login' %}">Login</a></span>
+        {% endif %}
+      </nav>
+ 
+    
+   
