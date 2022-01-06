@@ -14,7 +14,11 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
           <div class="navbar-nav">
+            {% if request.user.groups.all.0.name == 'admin' %}
             <a class="nav-item nav-link active" href="/"> Dashboard </a>
+            {% else %}
+            <a class="nav-item nav-link active" href="{% url 'create_order' request.user.id %}"> Create Order </a>
+            {% endif %}
             <a class="nav-item nav-link" href="{% url 'products' %}">Products</a>
           
           </div>

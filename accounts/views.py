@@ -6,14 +6,14 @@ from accounts.models import Customer, Order, Product
 
 from django.forms import inlineformset_factory
 from .filters import OrderFilter
-from .forms import RegistrationForm, OrderForm, CustomerForm
+from .forms import ProductForm, RegistrationForm, OrderForm, CustomerForm
 from django.contrib import messages
 from django.contrib.auth import authenticate, login , logout
 from django.contrib.auth.decorators import login_required
 from .decorators import unauthenticated_user, allowed_users, admin_only_or_customer
 from django.contrib.auth.models import User, Group
 
-# Create your views here.
+# Create your views here. 
 
 @unauthenticated_user
 def registerPage(request):
@@ -25,10 +25,12 @@ def registerPage(request):
             user = form.save()
             username = form.cleaned_data.get('username')
             messages.success(request, 'Account created sucessfully for' + " "+ username)
-            group = Group.objects.get(name = 'customer')
-            user.groups.add(group)
-            #messages.success(request, "Added to customer group sucesfully")
-            Customer.objects.create(user=user) # automatically add to a group when a new user signsup. we have our user field in Customer model
+
+            # We have removed this below section to Signals
+            # group = Group.objects.get(name = 'customer')
+            # user.groups.add(group)
+            # #messages.success(request, "Added to customer group sucesfully")
+            # Customer.objects.create(user=user,name = user.username) # automatically add to a group when a new user signsup. we have our user field in Customer model
             
             
             return redirect('login')
@@ -63,7 +65,7 @@ def logoutPage(request):
 @admin_only_or_customer
 def home(request):
     customers = Customer.objects.all()
-    orders = Order.objects.all()
+    orders = Order.objects.all().order_by('-date_created')
     total_customers = customers.count()
     total_orders = orders.count()
     pending_count = orders.filter(status='Pending').count()
@@ -93,9 +95,9 @@ def customers(request,id):
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['customer'])
 def createOrder(request,id):
-    OrderFormSet = inlineformset_factory(Customer,Order, fields=('product', 'status'))
+    OrderFormSet = inlineformset_factory(Customer,Order, fields=('product', ))
     customer = Customer.objects.get(id=id)
-    formset =OrderFormSet(instance=customer)
+    formset =OrderFormSet()
     #form =OrderForm(initial={'customer': customer})
     if request.method =='POST':
         formset = OrderFormSet(request.POST, instance=customer)
@@ -117,11 +119,11 @@ def updateORder(request, id):
             form.save()
             return redirect('/')
     context = {'form':form}
-    return render(request, 'order_form.html', context)
+    return render(request, 'update-form.html', context)
 
 
 @login_required(login_url='login')
-@allowed_users(allowed_roles=['admin'])
+@allowed_users(allowed_roles=['admin','customer'])
 def deleteOrder(request, id):
     order = Order.objects.get(id = id)
     if request.method =='POST':
@@ -134,7 +136,8 @@ def deleteOrder(request, id):
 @allowed_users(allowed_roles=['customer'])
 def userPage(request):
     
-    orders = request.user.customer.order_set.all()
+    orders = request.user.customer.order_set.all().order_by('-date_created')
+    
     total_order = orders.count()
     delivered = orders.filter(status ='Delivered').count()
     pending = orders.filter(status = 'Pending').count()
@@ -154,3 +157,16 @@ def accountSettings(request):
     
     context ={'form': form}
     return render(request, 'account-setting.html', context)    
+
+
+def product_display(request):
+    products = Product.objects.all()
+    context = {'products': products}
+    return render(request, 'list_product.html', context)
+
+def addProduct(request):
+    form = ProductForm()
+    context={}
+    return render(request, 'productForm.html', context)
+
+

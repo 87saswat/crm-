@@ -46,7 +46,9 @@
 	</div>
 </div>
 
-
+<br>
+<a class="btn btn-primary" href="{% url 'create_order' request.user.id %}">Create Order</a>
+<br>
 <br>
 
 		<div class="row">
@@ -60,16 +62,20 @@
                             <th>Date of Purchase</th>
 							<th>Product</th>
 							<th>Category</th>
-							
                             <th>Order Status</th>
+							<th>#</th>
 						</tr>
 						{% for order in orders %}
 						<tr>
                             <td>{{order.date_created}} </td>
 							<td>{{order.product}} </td>
 							<td>{{order.product.category}} </td>
-							
                             <td>{{order.status}} </td>
+							{% if order.status != 'Delivered' %}
+							<td><a class="btn btn-danger" href="{% url 'delete_order' order.id %}">Delete Order</a></td>
+							{% else %}
+							<td><a href="">Download Invoice</a> </td>
+							{% endif %}
 							
 						</tr>
 						{% endfor %}

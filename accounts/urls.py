@@ -13,6 +13,8 @@ urlpatterns = [
     path('update_order/<str:id>', views.updateORder, name='update_order'),
     path('delete_order/<str:id>', views.deleteOrder, name='delete_order'),
     path('userpage', views.userPage, name ='userpage'),
-    path('settings', views.accountSettings, name='settings')
+    path('settings', views.accountSettings, name='settings'),
+    path('product-display', views.product_display, name='product-display')
+
     
 ]
